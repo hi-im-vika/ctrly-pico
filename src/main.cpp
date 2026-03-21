@@ -38,6 +38,7 @@ void read_serial() {
   while (Serial.available()) {
     buf[pos++] = Serial.read();
     if (pos == FRAME_SIZE) {
+      rx_count++;
       pos = 0;
       memcpy(&input, buf, FRAME_SIZE);
     }
