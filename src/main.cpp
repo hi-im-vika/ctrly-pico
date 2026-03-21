@@ -73,6 +73,4 @@ void loop() {
       Serial2.printf("[tx%lu] ", tx_count);
     Serial2.println("BAD TX");  // payload was not delivered
   }
-
-  delay(10);
 }
