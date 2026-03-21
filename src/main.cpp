@@ -78,6 +78,8 @@ void setup() {
 }
 
 void loop() {
+  read_serial();
   bool report = radio.write(&payload, sizeof(float));  // transmit & save the report
   if (report) payload += 0.01;
+  Serial2.printf("RX: %d\r", rx_count);
 }
