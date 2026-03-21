@@ -8,6 +8,8 @@
 #define SPI0_MOSI   3
 #define RF24_INT    4
 #define RF24_CE     5
+#define UART1_RX    9
+#define UART1_TX    8
 
 RF24 radio(RF24_CE, SPI0_CSN);
 uint8_t address[5] = { 0xCE, 0x15, 0x10, 0x55, 0xBB };
@@ -15,8 +17,8 @@ uint8_t address[5] = { 0xCE, 0x15, 0x10, 0x55, 0xBB };
 float payload = 0.0;
 
 void setup() {
-  Serial2.setRX(9);
-  Serial2.setTX(8);
+  Serial2.setRX(UART1_RX);
+  Serial2.setTX(UART1_TX);
   Serial2.begin();
 
   SPI.setMISO(SPI0_MISO);
