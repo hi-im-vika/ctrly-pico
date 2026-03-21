@@ -26,7 +26,10 @@ RF24 radio(RF24_CE, SPI0_CSN);
 uint8_t address[5] = { 0xCE, 0x15, 0x10, 0x55, 0xBB };
 
 float payload = 0.0;
+
+/*---Count Variables---*/ 
 unsigned long tx_count = 0;
+unsigned long rx_count = 0;
 
 void read_serial() {
   uint8_t pos = 0;
