@@ -20,6 +20,7 @@ struct InputFrame {
 };
 #pragma pack(pop)
 static_assert(sizeof(InputFrame) == FRAME_SIZE, "frame size mismatch");
+InputFrame input = {};
 
 RF24 radio(RF24_CE, SPI0_CSN);
 uint8_t address[5] = { 0xCE, 0x15, 0x10, 0x55, 0xBB };
