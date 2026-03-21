@@ -40,7 +40,7 @@ void setup() {
   Serial2.print("Begin radio init...");
   while (!Serial2);
   if (!radio.begin()) {
-    Serial2.println(F("radio hardware is not responding!!"));
+    Serial2.println("radio hardware is not responding!!");
     while (1);
   }
   Serial2.println("OK");
@@ -61,13 +61,13 @@ void loop() {
   Serial2.printf("[%lu] ", millis());
   if (report) {
     Serial2.printf("[tx%lu] ", ++tx_count);
-    Serial2.print(F("TX OK "));
+    Serial2.print("TX OK ");
     Serial2.print(end_timer - start_timer);  // print the timer result
-    Serial2.println(F(" us"));
+    Serial2.println(" us");
     payload += 0.01;          // increment float payload
   } else {
       Serial2.printf("[tx%lu] ", tx_count);
-    Serial2.println(F("BAD TX"));  // payload was not delivered
+    Serial2.println("BAD TX");  // payload was not delivered
   }
 
   delay(10);
