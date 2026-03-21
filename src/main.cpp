@@ -28,6 +28,8 @@ float payload = 0.0;
 unsigned long tx_count = 0;
 
 void setup() {
+  Serial.begin();
+
   Serial2.setRX(UART1_RX);
   Serial2.setTX(UART1_TX);
   Serial2.begin();
