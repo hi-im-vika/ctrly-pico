@@ -78,19 +78,6 @@ void setup() {
 }
 
 void loop() {
-  unsigned long start_timer = micros();                // start the timer
   bool report = radio.write(&payload, sizeof(float));  // transmit & save the report
-  unsigned long end_timer = micros();                  // end the timer
-
-  Serial2.printf("[%lu] ", millis());
-  if (report) {
-    Serial2.printf("[tx%lu] ", ++tx_count);
-    Serial2.print("TX OK ");
-    Serial2.print(end_timer - start_timer);  // print the timer result
-    Serial2.println(" us");
-    payload += 0.01;          // increment float payload
-  } else {
-      Serial2.printf("[tx%lu] ", tx_count);
-    Serial2.println("BAD TX");  // payload was not delivered
-  }
+  if (report) payload += 0.01;
 }
