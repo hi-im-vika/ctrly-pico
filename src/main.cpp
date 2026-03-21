@@ -51,6 +51,7 @@ void setup() {
   radio.setPayloadSize(sizeof(payload));  // float datatype occupies 4 bytes
   radio.setAutoAck(false);
   radio.setRetries(0,0);
+  radio.setDataRate(RF24_2MBPS);
   radio.stopListening(address);
   Serial2.println("Radio config OK");
   delay(1000);
