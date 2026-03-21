@@ -49,6 +49,8 @@ void setup() {
     address[0], address[1], address[2], address[3], address[4]);
   radio.setPALevel(RF24_PA_LOW);
   radio.setPayloadSize(sizeof(payload));  // float datatype occupies 4 bytes
+  radio.setAutoAck(false);
+  radio.setRetries(0,0);
   radio.stopListening(address);
   Serial2.println("Radio config OK");
   delay(1000);
