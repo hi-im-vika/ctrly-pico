@@ -26,6 +26,7 @@ RF24 radio(RF24_CE, SPI0_CSN);
 uint8_t address[5] = { 0xCE, 0x15, 0x10, 0x55, 0xBB };
 
 float payload = 0.0;
+unsigned long last_report = millis();
 
 /*---Count Variables---*/ 
 unsigned long tx_count = 0;
@@ -81,5 +82,8 @@ void loop() {
   read_serial();
   bool report = radio.write(&payload, sizeof(float));  // transmit & save the report
   if (report) payload += 0.01;
-  Serial2.printf("RX: %d\r", rx_count);
+  if (millis() - last_report > 10) {
+    last_report = millis();
+    Serial2.printf("RX: %d\r", rx_count);
+  }
 }
