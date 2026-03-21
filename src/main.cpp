@@ -47,6 +47,7 @@ void setup() {
 
   Serial2.printf("TX address: 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",
     address[0], address[1], address[2], address[3], address[4]);
+  radio.setPALevel(RF24_PA_LOW);
   radio.setPayloadSize(sizeof(payload));  // float datatype occupies 4 bytes
   radio.stopListening(address);
   Serial2.println("Radio config OK");
