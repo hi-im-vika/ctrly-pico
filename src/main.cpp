@@ -11,6 +11,16 @@
 #define UART1_RX    9
 #define UART1_TX    8
 
+#define FRAME_SIZE 10
+
+#pragma pack(push, 1)
+struct InputFrame {
+  int16_t  lx, ly, rx, ry;
+  uint16_t buttons;
+};
+#pragma pack(pop)
+static_assert(sizeof(InputFrame) == FRAME_SIZE, "frame size mismatch");
+
 RF24 radio(RF24_CE, SPI0_CSN);
 uint8_t address[5] = { 0xCE, 0x15, 0x10, 0x55, 0xBB };
 
