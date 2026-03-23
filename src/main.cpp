@@ -13,9 +13,7 @@ bool new_input = false;
 unsigned long last_report = millis();
 
 /*---Count Variables---*/ 
-unsigned long tx_count = 0;
 unsigned long rx_count = 0;
-unsigned long fail_count = 0;
 
 void read_serial() {
   uint8_t pos = 0;
@@ -37,7 +35,7 @@ void read_serial() {
         buf[pos++] = b;
       } else {
         pos = 0;
-        fail_count++;
+        // fail_count++;
       }
     }
   }
@@ -46,7 +44,7 @@ void read_serial() {
 void write_serial() {
   if (Serial) {
     uint8_t buf[TM_FRAME_SIZE + 2];
-    TelemetryFrame tf = { tx_count, rx_count, fail_count };
+    TelemetryFrame tf = { Radio::get_tx_cnt(), rx_count, Radio::get_fail_cnt() };
     size_t encoded_len = COBS::encode(&tf,TM_FRAME_SIZE,buf);
     buf[TM_FRAME_SIZE + 1] = 0x00;
     Serial.write(buf,TM_FRAME_SIZE + 2);
@@ -71,7 +69,7 @@ void loop() {
   read_serial();
   if (new_input) {
     new_input = false;
-    Radio::transmit(input, rx_count, fail_count);
+    Radio::transmit(input);
   }
 }
 

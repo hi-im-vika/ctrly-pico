@@ -7,5 +7,8 @@
 namespace Radio {
 
     void init();
-    void transmit(InputFrame input, unsigned long tx_count, unsigned long fail_count);
+    void transmit(InputFrame input);
+
+    unsigned long get_tx_cnt();
+    unsigned long get_fail_cnt();
 }

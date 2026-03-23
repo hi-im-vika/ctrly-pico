@@ -10,6 +10,8 @@ namespace {
     constexpr uint8_t RF24_CE       = 5;
 
     constexpr uint8_t address[5] = { 0xCE, 0x15, 0x10, 0x55, 0xBB };
+    unsigned long tx_count          = 0;
+    unsigned long fail_count        = 0;
     RF24 radio(RF24_CE, SPI0_CSN);
 }
 
@@ -38,7 +40,7 @@ namespace Radio {
         radio.stopListening(address);
     }
 
-    void transmit(InputFrame input, unsigned long tx_count, unsigned long fail_count) {
+    void transmit(InputFrame input) {
         bool report = radio.writeFast(&input, FRAME_SIZE);  // transmit & save the report
         if (!radio.txStandBy(1000)) {
             radio.flush_tx();
@@ -47,5 +49,13 @@ namespace Radio {
         } else {
             tx_count++;
         }
+    }
+
+    unsigned long get_tx_cnt() {
+        return tx_count;
+    }
+
+    unsigned long get_fail_cnt() {
+        return fail_count;
     }
 }
