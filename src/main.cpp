@@ -30,6 +30,7 @@ unsigned long last_report = millis();
 /*---Count Variables---*/ 
 unsigned long tx_count = 0;
 unsigned long rx_count = 0;
+unsigned long fail_count = 0;
 
 void read_serial() {
   uint8_t pos = 0;
@@ -47,7 +48,7 @@ void read_serial() {
 
 void write_serial() {
   if (Serial) {
-    Serial.printf("Hello from TXP, total_tx: %d, total_rx: %d\r\n", tx_count, rx_count);
+    Serial.printf("Hello from TXP, total_tx: %d, total_rx: %d, total_fail: %d\r\n", tx_count, rx_count, fail_count);
   }
   delay(100);
 }
@@ -90,6 +91,7 @@ void loop() {
   if (!radio.txStandBy(1000)) {
     radio.flush_tx();
     Serial2.println("TX FAIL");
+    fail_count++;
   } else {
     tx_count++;
   }
