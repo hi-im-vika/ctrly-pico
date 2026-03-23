@@ -24,6 +24,7 @@ InputFrame input = {};
 
 RF24 radio(RF24_CE, SPI0_CSN);
 uint8_t address[5] = { 0xCE, 0x15, 0x10, 0x55, 0xBB };
+bool new_input = false;
 
 unsigned long last_report = millis();
 
@@ -42,6 +43,7 @@ void read_serial() {
       rx_count++;
       pos = 0;
       memcpy(&input, buf, FRAME_SIZE);
+      new_input = true;
     }
   }
 }
@@ -87,13 +89,16 @@ void setup() {
 
 void loop() {
   read_serial();
-  bool report = radio.writeFast(&input, FRAME_SIZE);  // transmit & save the report
-  if (!radio.txStandBy(1000)) {
-    radio.flush_tx();
-    Serial2.println("TX FAIL");
-    fail_count++;
-  } else {
-    tx_count++;
+  if (new_input) {
+    new_input = false;
+    bool report = radio.writeFast(&input, FRAME_SIZE);  // transmit & save the report
+    if (!radio.txStandBy(1000)) {
+      radio.flush_tx();
+      Serial2.println("TX FAIL");
+      fail_count++;
+    } else {
+      tx_count++;
+    }
   }
 }
 
