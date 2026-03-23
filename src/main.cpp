@@ -33,6 +33,35 @@ unsigned long tx_count = 0;
 unsigned long rx_count = 0;
 unsigned long fail_count = 0;
 
+/** COBS encode data to buffer
+	@param data Pointer to input data to encode
+	@param length Number of bytes to encode
+	@param buffer Pointer to encoded output buffer
+	@return Encoded buffer length in bytes
+	@note Does not output delimiter byte
+*/
+size_t cobsEncode(const void *data, size_t length, uint8_t *buffer) {
+	assert(data && buffer);
+
+	uint8_t *encode = buffer; // Encoded byte pointer
+	uint8_t *codep = encode++; // Output code pointer
+	uint8_t code = 1; // Code value
+
+	for (const uint8_t *byte = (const uint8_t *)data; length--; ++byte) {
+		if (*byte) // Byte not zero, write it
+			*encode++ = *byte, ++code;
+
+		if (!*byte || code == 0xff) { // Input is zero or block completed, restart
+      *codep = code, code = 1, codep = encode;
+			if (!*byte || length)
+				++encode;
+		}
+	}
+	*codep = code; // Write final code value
+
+	return (size_t)(encode - buffer);
+}
+
 /** COBS decode data from buffer
 	@param buffer Pointer to encoded input bytes
 	@param length Number of bytes to decode
