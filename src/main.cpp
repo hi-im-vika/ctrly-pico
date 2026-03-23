@@ -64,15 +64,26 @@ size_t cobs_decode(const uint8_t *buffer, size_t length, void *data) {
 
 void read_serial() {
   uint8_t pos = 0;
-  uint8_t buf[FRAME_SIZE];
+  uint8_t buf[FRAME_SIZE + 2];  // fs + COBS overhead + delimiter
 
-  while (Serial.available()) {
-    buf[pos++] = Serial.read();
-    if (pos == FRAME_SIZE) {
-      rx_count++;
+  while (Serial.available() && !new_input) {
+    uint8_t b = Serial.read();
+    if (b == 0x00) {
+      if (pos == FRAME_SIZE + 1) {
+        uint8_t decoded[FRAME_SIZE];
+        size_t decoded_len = cobs_decode(buf, pos, decoded);
+        memcpy(&input, decoded, decoded_len);
+        new_input = true;
+        rx_count++;
+      }
       pos = 0;
-      memcpy(&input, buf, FRAME_SIZE);
-      new_input = true;
+    } else {
+      if (pos < sizeof(buf)) {
+        buf[pos++] = b;
+      } else {
+        pos = 0;
+        fail_count++;
+      }
     }
   }
 }
