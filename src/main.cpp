@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <RF24.h>
 #include <SPI.h>
+#include "COBS.hpp"
 
 #define SPI0_MISO   0
 #define SPI0_CSN    1
@@ -45,64 +46,6 @@ unsigned long tx_count = 0;
 unsigned long rx_count = 0;
 unsigned long fail_count = 0;
 
-/** COBS encode data to buffer
-	@param data Pointer to input data to encode
-	@param length Number of bytes to encode
-	@param buffer Pointer to encoded output buffer
-	@return Encoded buffer length in bytes
-	@note Does not output delimiter byte
-*/
-size_t cobs_encode(const void *data, size_t length, uint8_t *buffer) {
-	assert(data && buffer);
-
-	uint8_t *encode = buffer; // Encoded byte pointer
-	uint8_t *codep = encode++; // Output code pointer
-	uint8_t code = 1; // Code value
-
-	for (const uint8_t *byte = (const uint8_t *)data; length--; ++byte) {
-		if (*byte) // Byte not zero, write it
-			*encode++ = *byte, ++code;
-
-		if (!*byte || code == 0xff) { // Input is zero or block completed, restart
-      *codep = code, code = 1, codep = encode;
-			if (!*byte || length)
-				++encode;
-		}
-	}
-	*codep = code; // Write final code value
-
-	return (size_t)(encode - buffer);
-}
-
-/** COBS decode data from buffer
-	@param buffer Pointer to encoded input bytes
-	@param length Number of bytes to decode
-	@param data Pointer to decoded output data
-	@return Number of bytes successfully decoded
-	@note Stops decoding if delimiter byte is found
-*/
-size_t cobs_decode(const uint8_t *buffer, size_t length, void *data) {
-	assert(buffer && data);
-
-	const uint8_t *byte = buffer; // Encoded input byte pointer
-	uint8_t *decode = (uint8_t *)data; // Decoded output byte pointer
-
-	for (uint8_t code = 0xff, block = 0; byte < buffer + length; --block) {
-		if (block) // Decode block byte
-			*decode++ = *byte++;
-		else {
-			block = *byte++;             // Fetch the next block length
-			if (block && (code != 0xff)) // Encoded zero, write it unless it's delimiter.
-				*decode++ = 0;
-			code = block;
-			if (!code) // Delimiter code found
-				break;
-		}
-	}
-
-	return (size_t)(decode - (uint8_t *)data);
-}
-
 void read_serial() {
   uint8_t pos = 0;
   uint8_t buf[FRAME_SIZE + 2];  // fs + COBS overhead + delimiter
@@ -112,7 +55,7 @@ void read_serial() {
     if (b == 0x00) {
       if (pos == FRAME_SIZE + 1) {
         uint8_t decoded[FRAME_SIZE];
-        size_t decoded_len = cobs_decode(buf, pos, decoded);
+        size_t decoded_len = COBS::decode(buf, pos, decoded);
         memcpy(&input, decoded, decoded_len);
         new_input = true;
         rx_count++;
@@ -133,7 +76,7 @@ void write_serial() {
   if (Serial) {
     uint8_t buf[TM_FRAME_SIZE + 2];
     TelemetryFrame tf = { tx_count, rx_count, fail_count };
-    size_t encoded_len = cobs_encode(&tf,TM_FRAME_SIZE,buf);
+    size_t encoded_len = COBS::encode(&tf,TM_FRAME_SIZE,buf);
     buf[TM_FRAME_SIZE + 1] = 0x00;
     Serial.write(buf,TM_FRAME_SIZE + 2);
     // Serial.printf("Hello from TXP, total_tx: %d, total_rx: %d, total_fail: %d\r\n", tx_count, rx_count, fail_count);
