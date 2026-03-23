@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <SPI.h>
 #include "Radio.hpp"
 #include "types.hpp"
 
