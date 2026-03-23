@@ -1,25 +1,15 @@
 #include <Arduino.h>
-#include <RF24.h>
 #include <SPI.h>
-#include "COBS.hpp"
+#include "Radio.hpp"
 #include "types.hpp"
 
-#define SPI0_MISO   0
-#define SPI0_CSN    1
-#define SPI0_SCK    2
-#define SPI0_MOSI   3
-#define RF24_INT    4
-#define RF24_CE     5
 #define UART1_RX    9
 #define UART1_TX    8
 
 InputFrame input = {};
 TelemetryFrame tm = {};
 
-RF24 radio(RF24_CE, SPI0_CSN);
-uint8_t address[5] = { 0xCE, 0x15, 0x10, 0x55, 0xBB };
 bool new_input = false;
-
 unsigned long last_report = millis();
 
 /*---Count Variables---*/ 
@@ -72,27 +62,7 @@ void setup() {
   Serial2.setTX(UART1_TX);
   Serial2.begin();
 
-  SPI.setMISO(SPI0_MISO);
-  SPI.setCS(SPI0_CSN);
-  SPI.setSCK(SPI0_SCK);
-  SPI.setMOSI(SPI0_MOSI);
-
-  Serial2.print("Begin radio init...");
-  while (!Serial2);
-  if (!radio.begin()) {
-    Serial2.println("radio hardware is not responding!!");
-    while (1);
-  }
-  Serial2.println("OK");
-
-  Serial2.printf("TX address: 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",
-    address[0], address[1], address[2], address[3], address[4]);
-  radio.setPALevel(RF24_PA_LOW);
-  radio.setPayloadSize(FRAME_SIZE);  // float datatype occupies 4 bytes
-  radio.setAutoAck(false);
-  radio.setRetries(0,0);
-  radio.setDataRate(RF24_2MBPS);
-  radio.stopListening(address);
+  Radio::init();
   Serial2.println("Radio config OK");
   delay(1000);
 }
@@ -101,14 +71,7 @@ void loop() {
   read_serial();
   if (new_input) {
     new_input = false;
-    bool report = radio.writeFast(&input, FRAME_SIZE);  // transmit & save the report
-    if (!radio.txStandBy(1000)) {
-      radio.flush_tx();
-      Serial2.println("TX FAIL");
-      fail_count++;
-    } else {
-      tx_count++;
-    }
+    Radio::transmit(input, rx_count, fail_count);
   }
 }
 
