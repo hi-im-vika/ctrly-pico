@@ -138,6 +138,7 @@ void write_serial() {
     Serial.write(buf,TM_FRAME_SIZE + 2);
     // Serial.printf("Hello from TXP, total_tx: %d, total_rx: %d, total_fail: %d\r\n", tx_count, rx_count, fail_count);
   }
+  delay(1);
 }
 
 void setup() {
