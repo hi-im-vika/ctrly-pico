@@ -33,6 +33,35 @@ unsigned long tx_count = 0;
 unsigned long rx_count = 0;
 unsigned long fail_count = 0;
 
+/** COBS decode data from buffer
+	@param buffer Pointer to encoded input bytes
+	@param length Number of bytes to decode
+	@param data Pointer to decoded output data
+	@return Number of bytes successfully decoded
+	@note Stops decoding if delimiter byte is found
+*/
+size_t cobs_decode(const uint8_t *buffer, size_t length, void *data) {
+	assert(buffer && data);
+
+	const uint8_t *byte = buffer; // Encoded input byte pointer
+	uint8_t *decode = (uint8_t *)data; // Decoded output byte pointer
+
+	for (uint8_t code = 0xff, block = 0; byte < buffer + length; --block) {
+		if (block) // Decode block byte
+			*decode++ = *byte++;
+		else {
+			block = *byte++;             // Fetch the next block length
+			if (block && (code != 0xff)) // Encoded zero, write it unless it's delimiter.
+				*decode++ = 0;
+			code = block;
+			if (!code) // Delimiter code found
+				break;
+		}
+	}
+
+	return (size_t)(decode - (uint8_t *)data);
+}
+
 void read_serial() {
   uint8_t pos = 0;
   uint8_t buf[FRAME_SIZE];
