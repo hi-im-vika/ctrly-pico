@@ -8,7 +8,7 @@ namespace COBS {
         @return Encoded buffer length in bytes
         @note Does not output delimiter byte
     */
-    size_t cobsEncode(const void *data, size_t length, uint8_t *buffer) {
+    size_t encode(const void *data, size_t length, uint8_t *buffer) {
         assert(data && buffer);
 
         uint8_t *encode = buffer; // Encoded byte pointer
