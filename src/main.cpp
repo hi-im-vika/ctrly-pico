@@ -45,6 +45,13 @@ void read_serial() {
   }
 }
 
+void write_serial() {
+  if (Serial) {
+    Serial.printf("Hello from TXP, total_tx: %d, total_rx: %d\r\n", tx_count, rx_count);
+  }
+  delay(1000);
+}
+
 void setup() {
   Serial.begin();
 
@@ -90,4 +97,8 @@ void loop() {
     last_report = millis();
     Serial2.printf("RX: %d TX: %d\r", rx_count, tx_count);
   }
+}
+
+void loop1() {
+  write_serial();
 }
