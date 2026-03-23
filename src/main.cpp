@@ -93,10 +93,6 @@ void loop() {
   } else {
     tx_count++;
   }
-  if (millis() - last_report > 10) {
-    last_report = millis();
-    Serial2.printf("RX: %d TX: %d\r", rx_count, tx_count);
-  }
 }
 
 void loop1() {
