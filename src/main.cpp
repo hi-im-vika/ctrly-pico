@@ -131,9 +131,13 @@ void read_serial() {
 
 void write_serial() {
   if (Serial) {
-    Serial.printf("Hello from TXP, total_tx: %d, total_rx: %d, total_fail: %d\r\n", tx_count, rx_count, fail_count);
+    uint8_t buf[TM_FRAME_SIZE + 2];
+    TelemetryFrame tf = { tx_count, rx_count, fail_count };
+    size_t encoded_len = cobs_encode(&tf,TM_FRAME_SIZE,buf);
+    buf[TM_FRAME_SIZE + 1] = 0x00;
+    Serial.write(buf,TM_FRAME_SIZE + 2);
+    // Serial.printf("Hello from TXP, total_tx: %d, total_rx: %d, total_fail: %d\r\n", tx_count, rx_count, fail_count);
   }
-  delay(100);
 }
 
 void setup() {
