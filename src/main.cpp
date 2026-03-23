@@ -49,7 +49,7 @@ void write_serial() {
   if (Serial) {
     Serial.printf("Hello from TXP, total_tx: %d, total_rx: %d\r\n", tx_count, rx_count);
   }
-  delay(1000);
+  delay(100);
 }
 
 void setup() {
